@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>11.2B Linear Functions and Linear Graphs (2) — Learning Deck</title>
+<style>
+  :root{
+    --toolbar-h: 52px;
+    --footer-h: 72px;
+    --header-h: 56px;
+    --navy: #15172B;
+    --amber: #FFB627;
+    --pink: #FF2D85;
+    --coral: #FF5A45;
+    --teal: #17C3B2;
+    --purple: #6C5CE7;
+    --bg: #F4F1FF;
+    --panel: #FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;font-family:'Segoe UI',Verdana,Arial,sans-serif;background:var(--bg);color:var(--navy);}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column;}
+
+  /* ===== HEADER ===== */
+  #topHeader{
+    height:var(--header-h);flex:0 0 auto;background:var(--navy);color:#fff;
+    display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:50;
+  }
+  #topHeader .title{font-weight:700;font-size:14px;}
+  #progressChips{display:flex;gap:5px;flex-wrap:wrap;max-width:55%;}
+  .chip{width:10px;height:10px;border-radius:50%;background:#3a3d5c;transition:background .2s;}
+  .chip.active{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+  .chip.done{background:var(--teal);}
+  #resetBtn{background:transparent;border:1px solid #666;color:#ddd;border-radius:8px;font-size:11px;padding:5px 8px;cursor:pointer;}
+  #resetBtn:active{background:#333;}
+
+  /* ===== MATH TOOLBAR (always visible) ===== */
+  #mathToolbar{
+    height:var(--toolbar-h);flex:0 0 auto;background:#221F3B;display:flex;gap:4px;
+    overflow-x:auto;align-items:center;padding:0 8px;z-index:49;
+    -webkit-overflow-scrolling:touch;scroll-behavior:smooth;
+  }
+  #mathToolbar button{
+    flex:0 0 auto;min-width:36px;height:38px;border-radius:8px;border:none;
+    background:#332f57;color:#fff;font-size:15px;cursor:pointer;
+  }
+  #mathToolbar button:active{background:var(--purple);}
+  #mathToolbar .tb-sep{width:1px;height:26px;background:#444;flex:0 0 auto;margin:0 4px;}
+  @media (min-width:700px){
+    :root{ --toolbar-h: 58px; }
+    #mathToolbar button{min-width:42px;height:42px;font-size:16px;}
+  }
+
+  /* ===== MAIN SCROLL AREA ===== */
+  #pageViewport{flex:1 1 auto;position:relative;overflow:hidden;}
+  .page{
+    position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:18px 16px 32px;display:none;
+  }
+  .page.current{display:block;}
+  .pageInner{max-width:760px;margin:0 auto;}
+  /* iPad / larger tablet & desktop viewports: give content and grids more room */
+  @media (min-width:700px){
+    .pageInner{max-width:880px;}
+    .card{padding:22px;}
+  }
+  @media (min-width:1000px){
+    .pageInner{max-width:960px;}
+    h2.pageTitle{font-size:24px;}
+  }
+
+  h2.pageTitle{color:var(--purple);font-size:21px;margin:0 0 4px;}
+  .subtle{color:#666;font-size:13px;margin-bottom:14px;}
+  .card{background:var(--panel);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 2px 10px rgba(21,23,43,.07);}
+
+  /* ===== FOOTER NAV (structurally outside scroll container) ===== */
+  #footerNav{
+    height:var(--footer-h);flex:0 0 auto;background:#fff;border-top:2px solid #eee;
+    display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:50;
+  }
+  .navBtn{padding:12px 20px;border-radius:12px;border:none;font-weight:700;font-size:15px;cursor:pointer;}
+  #backBtn{background:#e9e6fb;color:var(--purple);}
+  #backBtn:disabled{opacity:.35;}
+  #nextBtn{background:var(--purple);color:#fff;}
+  #pageLabel{font-size:12px;color:#888;}
+
+  /* ===== LASER POINTER ===== */
+  #laserToggle{
+    position:fixed;right:14px;bottom:calc(var(--footer-h) + 14px);z-index:200;
+    background:var(--navy);color:#fff;border:none;border-radius:50%;width:46px;height:46px;
+    font-size:18px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.3);
+  }
+  #laserToggle.on{background:var(--pink);}
+  #laserDot{
+    position:fixed;width:22px;height:22px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,45,133,1) 0%,rgba(255,45,133,.5) 55%,rgba(255,45,133,0) 75%);
+    pointer-events:none;z-index:9999;display:none;transform:translate(-50%,-50%);
+  }
+  @media print{ #laserToggle,#laserDot{display:none !important;} }
+
+  /* ===== OBJECTIVES ===== */
+  .objList li{margin-bottom:10px;font-size:15px;}
+  .objList input{margin-right:8px;transform:scale(1.3);}
+
+  /* ===== VOCAB CHIP (3G2-style not used here but small chip helper) ===== */
+  .term-chip{display:inline-block;background:var(--teal);color:#fff;padding:2px 8px;border-radius:8px;font-weight:700;}
+
+  /* ===== FLIP CARDS ===== */
+  .flipGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:520px){.flipGrid{grid-template-columns:1fr;}}
+  @media (min-width:900px){.flipGrid{grid-template-columns:1fr 1fr 1fr;}}
+  .flipCard{perspective:1000px;height:130px;cursor:pointer;}
+  .flipInner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s;}
+  .flipCard.flipped .flipInner{transform:rotateY(180deg);}
+  .flipFace{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    text-align:center;padding:10px;backface-visibility:hidden;font-weight:700;}
+  .flipFront{background:var(--amber);color:#3a2600;box-shadow:0 0 0px var(--pink);
+    animation:pulseGlow 1.8s infinite;}
+  .flipCard.flipped .flipFront{animation:none;}
+  .flipBack{background:#efe9ff;color:var(--navy);transform:rotateY(180deg);font-weight:500;font-size:13.5px;}
+  @keyframes pulseGlow{
+    0%{box-shadow:0 0 8px 0 rgba(255,45,133,.35);}
+    50%{box-shadow:0 0 22px 6px rgba(255,45,133,.75);}
+    100%{box-shadow:0 0 8px 0 rgba(255,45,133,.35);}
+  }
+
+  /* ===== WARNING / COMMON ERROR ===== */
+  .warnBox{background:var(--coral);color:#fff;border-radius:12px;padding:12px 14px;margin:14px 0;font-size:14px;font-weight:600;}
+
+  /* ===== STACKED FRACTION ===== */
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 3px;font-weight:700;}
+  .frac .num{padding:0 4px;border-bottom:2px solid currentColor;line-height:1.15;}
+  .frac .den{padding:0 4px;line-height:1.15;}
+
+  /* ===== VERTICAL STEPS ===== */
+  .steps{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
+  .step-line{background:#f2effc;border-left:4px solid var(--purple);padding:7px 10px;border-radius:6px;font-size:14.5px;}
+
+  /* ===== TABLE TASK ===== */
+  table.valTable{border-collapse:collapse;width:100%;margin:10px 0;}
+  table.valTable th,table.valTable td{border:2px solid var(--navy);text-align:center;padding:8px 4px;font-weight:700;font-size:15px;}
+  table.valTable th{background:#e9e6fb;}
+  table.valTable input{width:56px;padding:6px 2px;font-size:15px;text-align:center;border:2px solid var(--purple);border-radius:6px;font-weight:700;}
+  table.valTable input.given{border:2px solid #ccc;background:#f4f4f4;color:#888;}
+  table.valTable input.correct{border-color:var(--teal);background:#e4fbf7;color:#0a8f7f;}
+  table.valTable input.wrong{border-color:var(--coral);background:#ffece9;}
+
+  /* ===== BUTTONS ===== */
+  .actionBtn{background:var(--purple);color:#fff;border:none;padding:10px 16px;border-radius:10px;
+    font-weight:700;font-size:14px;cursor:pointer;margin:6px 6px 6px 0;}
+  .actionBtn.secondary{background:#e9e6fb;color:var(--purple);}
+  .actionBtn:disabled{opacity:.45;}
+
+  .feedback{margin-top:8px;font-size:14px;font-weight:700;border-radius:8px;padding:8px 10px;display:none;}
+  .feedback.good{display:block;background:#e4fbf7;color:#0a8f7f;}
+  .feedback.bad{display:block;background:#fff0ee;color:var(--coral);}
+  .hintBox{margin-top:8px;background:#fff7e6;border:2px dashed var(--amber);border-radius:8px;padding:8px 10px;font-size:13.5px;display:none;}
+
+  /* ===== PLOT GRID ===== */
+  .gridWrap{width:100%;max-width:560px;margin:10px auto;touch-action:none;}
+  .gridWrap svg{width:100%;height:auto;display:block;background:#fff;border-radius:8px;}
+  .gridLegend{font-size:12px;color:#777;text-align:center;margin-top:4px;}
+  @media (min-width:700px){ .gridWrap{max-width:680px;} }
+  @media (min-width:1000px){ .gridWrap{max-width:760px;} }
+
+  /* ===== MCQ ===== */
+  .mcqOpt{display:block;width:100%;text-align:left;background:#f2effc;border:2px solid #ddd6fb;
+    border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:14.5px;cursor:pointer;font-weight:600;}
+  .mcqOpt.correctPick{background:#e4fbf7;border-color:var(--teal);}
+  .mcqOpt.wrongPick{background:#fff0ee;border-color:var(--coral);}
+
+  .thinkBadge{display:inline-block;background:var(--pink);color:#fff;font-size:11px;font-weight:700;
+    padding:2px 8px;border-radius:8px;margin-bottom:6px;}
+
+  .screenshotReminder{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;border-radius:14px;
+    padding:16px;text-align:center;font-weight:700;font-size:15px;margin:16px 0;box-shadow:0 4px 14px rgba(108,92,231,.4);}
+  .screenshotReminder .emoji{font-size:30px;display:block;margin-bottom:6px;}
+
+  .summarySection{border-left:5px solid var(--purple);padding-left:12px;margin-bottom:16px;}
+  .summarySection h3{margin:0 0 6px;color:var(--purple);font-size:16px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="topHeader">
+    <div class="title">11.2B Linear Functions &amp; Graphs (2)</div>
+    <div id="progressChips"></div>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <div id="mathToolbar">
+    <!-- basic operators -->
+    <button data-ins="+">+</button>
+    <button data-ins="−">−</button>
+    <button data-ins="×">×</button>
+    <button data-ins="÷">÷</button>
+    <button data-ins="=">=</button>
+    <button data-ins="(">(</button>
+    <button data-ins=")">)</button>
+    <div class="tb-sep"></div>
+    <!-- indices / roots -->
+    <button data-ins="x">x</button>
+    <button data-ins="y">y</button>
+    <button data-ins="²">x²</button>
+    <button data-ins="³">x³</button>
+    <button data-ins="⁻¹">⁻¹</button>
+    <button data-ins="√">√</button>
+    <div class="tb-sep"></div>
+    <!-- greek -->
+    <button data-ins="π">π</button>
+    <button data-ins="θ">θ</button>
+    <button data-ins="°">°</button>
+    <div class="tb-sep"></div>
+    <!-- geometry / relations -->
+    <button data-ins="∠">∠</button>
+    <button data-ins="△">△</button>
+    <button data-ins="∥">∥</button>
+    <button data-ins="⊥">⊥</button>
+    <button data-ins="≈">≈</button>
+    <button data-ins="≤">≤</button>
+    <button data-ins="≥">≥</button>
+    <button data-ins="≠">≠</button>
+    <div class="tb-sep"></div>
+    <!-- sets/logic/calc/stats -->
+    <button data-ins="±">±</button>
+    <button data-ins="∞">∞</button>
+    <button data-ins="∑">∑</button>
+    <button data-ins="∈">∈</button>
+    <button data-ins="∴">∴</button>
+  </div>
+
+  <div id="pageViewport"></div>
+
+  <div id="footerNav">
+    <button id="backBtn" class="navBtn">◀ Back</button>
+    <span id="pageLabel"></span>
+    <button id="nextBtn" class="navBtn">Next ▶</button>
+  </div>
+</div>
+
+<button id="laserToggle" title="Laser Pointer">🔴</button>
+<div id="laserDot"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   PROGRESS / CHECKPOINTING
+   ============================================================ */
+const STORAGE_KEY = "bls_1g3_linfn_11_2B_deck_v1";
+let STATE = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { currentPage:0, tasks:{}, flips:{} };
+}
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); }catch(e){}
+}
+// custom confirm modal (native dialogs are blocked in sandboxed iframes)
+function customConfirm(msg, onYes){
+  const overlay = document.createElement("div");
+  overlay.style.cssText = "position:fixed;inset:0;background:rgba(21,23,43,.55);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px;";
+  overlay.innerHTML = `<div style="background:#fff;border-radius:14px;padding:20px;max-width:320px;text-align:center;">
+    <p style="font-size:14.5px;color:#15172B;margin-bottom:16px;">${msg}</p>
+    <button id="cfYes" class="actionBtn">Yes, reset</button>
+    <button id="cfNo" class="actionBtn secondary">Cancel</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector("#cfYes").onclick = function(){ document.body.removeChild(overlay); onYes(); };
+  overlay.querySelector("#cfNo").onclick = function(){ document.body.removeChild(overlay); };
+}
+document.getElementById("resetBtn").onclick = function(){
+  customConfirm("Reset all your progress on this deck? This cannot be undone.", function(){
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  });
+};
+
+/* ============================================================
+   MATH TOOLBAR — inserts into last focused text input
+   ============================================================ */
+let lastFocusedInput = null;
+document.addEventListener("focusin", function(e){
+  if(e.target.tagName === "INPUT" && e.target.type === "text"){
+    lastFocusedInput = e.target;
+  }
+});
+document.getElementById("mathToolbar").addEventListener("click", function(e){
+  const btn = e.target.closest("button[data-ins]");
+  if(!btn) return;
+  if(lastFocusedInput){
+    const sym = btn.getAttribute("data-ins");
+    const start = lastFocusedInput.selectionStart ?? lastFocusedInput.value.length;
+    const end = lastFocusedInput.selectionEnd ?? lastFocusedInput.value.length;
+    const v = lastFocusedInput.value;
+    lastFocusedInput.value = v.slice(0,start) + sym + v.slice(end);
+    lastFocusedInput.focus();
+    lastFocusedInput.selectionStart = lastFocusedInput.selectionEnd = start + sym.length;
+  }
+});
+
+/* ============================================================
+   LASER POINTER
+   ============================================================ */
+const laserToggle = document.getElementById("laserToggle");
+const laserDot = document.getElementById("laserDot");
+let laserOn = false;
+laserToggle.addEventListener("click", function(){
+  laserOn = !laserOn;
+  laserToggle.classList.toggle("on", laserOn);
+  laserDot.style.display = laserOn ? "block" : "none";
+});
+function moveLaser(x,y){
+  laserDot.style.left = x+"px";
+  laserDot.style.top = y+"px";
+}
+document.addEventListener("mousemove", function(e){ if(laserOn) moveLaser(e.clientX,e.clientY); }, {passive:true});
+document.addEventListener("touchmove", function(e){
+  if(laserOn && e.touches && e.touches[0]){ moveLaser(e.touches[0].clientX, e.touches[0].clientY); }
+}, {passive:true}); // passive: never blocks/movepage scroll
+
+/* ============================================================
+   PAGE DEFINITIONS
+   ============================================================ */
+const pages = [
+  { id:"title",      title:"Learning Objectives", render: renderTitlePage },
+  { id:"everypage",  title:"What You'll See On Every Page", render: renderEveryPage },
+  { id:"hook",       title:"Why Scale Matters", render: renderHookPage },
+  { id:"vocab",      title:"Key Vocabulary", render: renderVocabPage },
+  { id:"scale",      title:"Understanding Scale", render: renderScalePage },
+  { id:"steps",      title:"3 Steps to Draw a Linear Graph", render: renderStepsPage },
+  { id:"ex1",        title:"Example 1: y = −x + 2", render: renderExample1 },
+  { id:"ex2",        title:"Example 2: y = 2x + 4", render: renderExample2 },
+  { id:"b1",         title:"Practice B1", render: renderB1 },
+  { id:"b2",         title:"Practice B2", render: renderB2 },
+  { id:"b3",         title:"Practice B3", render: renderB3 },
+  { id:"b4",         title:"Practice B4", render: renderB4 },
+  { id:"summary",    title:"Summary", render: renderSummaryPage },
+];
+
+const viewport = document.getElementById("pageViewport");
+const chipsWrap = document.getElementById("progressChips");
+const pageLabel = document.getElementById("pageLabel");
+const backBtn = document.getElementById("backBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+let pageEls = [];
+
+function buildPages(){
+  pages.forEach(function(p, idx){
+    const div = document.createElement("div");
+    div.className = "page";
+    div.id = "page_"+p.id;
+    const inner = document.createElement("div");
+    inner.className = "pageInner";
+    div.appendChild(inner);
+    viewport.appendChild(div);
+    pageEls.push(div);
+  });
+  // build progress chips
+  pages.forEach(function(p, idx){
+    const c = document.createElement("div");
+    c.className = "chip";
+    c.dataset.idx = idx;
+    chipsWrap.appendChild(c);
+  });
+}
+buildPages();
+
+function renderPageContent(idx){
+  const inner = pageEls[idx].querySelector(".pageInner");
+  if(inner.dataset.rendered === "1") return;
+  pages[idx].render(inner);
+  inner.dataset.rendered = "1";
+}
+
+function goToPage(idx){
+  if(idx<0 || idx>=pages.length) return;
+  pageEls.forEach(function(el,i){ el.classList.toggle("current", i===idx); el.scrollTop = 0; });
+  renderPageContent(idx);
+  STATE.currentPage = idx;
+  saveState();
+  updateChrome(idx);
+}
+
+function updateChrome(idx){
+  pageLabel.textContent = "Page " + (idx+1) + " of " + pages.length;
+  backBtn.disabled = idx===0;
+  nextBtn.textContent = idx===pages.length-1 ? "Finish 🎉" : "Next ▶";
+  Array.from(chipsWrap.children).forEach(function(c,i){
+    c.classList.toggle("active", i===idx);
+    c.classList.toggle("done", i<idx);
+  });
+}
+
+backBtn.addEventListener("click", function(){ goToPage(STATE.currentPage-1); });
+nextBtn.addEventListener("click", function(){
+  if(STATE.currentPage===pages.length-1){
+    customConfirm("Great work! Have you screenshot your Summary page? Tap Yes to close this reminder.", function(){});
+    return;
+  }
+  goToPage(STATE.currentPage+1);
+});
+
+/* ============================================================
+   REUSABLE: FLIP CARD BUILDER
+   ============================================================ */
+function makeFlipCard(id, frontHTML, backHTML){
+  const wrap = document.createElement("div");
+  wrap.className = "flipCard";
+  if(STATE.flips[id]) wrap.classList.add("flipped");
+  wrap.innerHTML = `<div class="flipInner">
+      <div class="flipFace flipFront">${frontHTML}</div>
+      <div class="flipFace flipBack">${backHTML}</div>
+    </div>`;
+  wrap.addEventListener("click", function(){
+    wrap.classList.toggle("flipped");
+    STATE.flips[id] = wrap.classList.contains("flipped");
+    saveState();
+  });
+  return wrap;
+}
+
+/* ============================================================
+   STUDENT NUMBER PARSING — forgiving of stray spaces, the
+   toolbar's Unicode minus sign (−), and comma decimals
+   ============================================================ */
+function parseStudentNumber(raw){
+  if(raw == null) return NaN;
+  let s = String(raw).trim();
+  s = s.replace(/[\u2212\u2010\u2011\u2012\u2013\u2014]/g, "-"); // normalise any dash/minus variant to ASCII "-"
+  s = s.replace(",", ".");
+  return parseFloat(s);
+}
+
+/* ============================================================
+   REUSABLE: STACKED FRACTION HTML HELPER
+   ============================================================ */
+function frac(num, den){
+  return `<span class="frac"><span class="num">${num}</span><span class="den">${den}</span></span>`;
+}
+
+/* ============================================================
+   REUSABLE: TABLE-OF-VALUES TASK
+   config = {
+     id, equationHTML, xValues:[...], yValues:[...] (correct, can be decimals),
+     givenIndices:[indices already filled & locked],
+     hint: string, workingSteps: [strings] (shown on 2nd wrong, generic method demo)
+   }
+   ============================================================ */
+function buildTableTask(container, cfg){
+  const taskState = STATE.tasks[cfg.id] || { attempts:0, solved:false, values:{} };
+  STATE.tasks[cfg.id] = taskState;
+
+  const box = document.createElement("div");
+  box.className = "card";
+  box.innerHTML = `<p style="font-weight:700;">Complete the table of values for ${cfg.equationHTML}</p>`;
+
+  const table = document.createElement("table");
+  table.className = "valTable";
+  const headRow = document.createElement("tr");
+  headRow.innerHTML = "<th>x</th>" + cfg.xValues.map(function(x){return "<td>"+x+"</td>";}).join("");
+  const bodyRow = document.createElement("tr");
+  let cells = "<th>y</th>";
+  cfg.xValues.forEach(function(x, i){
+    const isGiven = cfg.givenIndices.includes(i);
+    const savedVal = taskState.values[i];
+    if(isGiven){
+      cells += `<td><input type="text" class="given" value="${cfg.yValues[i]}" disabled></td>`;
+    }else{
+      cells += `<td><input type="text" data-i="${i}" value="${savedVal!==undefined?savedVal:''}"></td>`;
+    }
+  });
+  bodyRow.innerHTML = cells;
+  table.appendChild(headRow);
+  table.appendChild(bodyRow);
+  box.appendChild(table);
+
+  const checkBtn = document.createElement("button");
+  checkBtn.className = "actionBtn";
+  checkBtn.textContent = "Check Table";
+  box.appendChild(checkBtn);
+
+  const fb = document.createElement("div");
+  fb.className = "feedback";
+  box.appendChild(fb);
+
+  const hintBox = document.createElement("div");
+  hintBox.className = "hintBox";
+  hintBox.innerHTML = "💡 <b>Hint:</b> " + cfg.hint;
+  box.appendChild(hintBox);
+
+  const solutionBox = document.createElement("div");
+  solutionBox.style.display = "none";
+  solutionBox.innerHTML = `<div class="warnBox">Let's work through it together 👇</div>
+    <div class="steps">${cfg.workingSteps.map(function(s){return '<div class="step-line">'+s+'</div>';}).join("")}</div>`;
+  box.appendChild(solutionBox);
+
+  if(taskState.solved){
+    fb.className = "feedback good";
+    fb.textContent = "✅ All correct — nice work!";
+    table.querySelectorAll("input:not(.given)").forEach(function(inp){ inp.classList.add("correct"); inp.disabled=true; });
+    checkBtn.disabled = true;
+  }
+  if(taskState.attempts>=2 && !taskState.solved){
+    hintBox.style.display="none";
+    solutionBox.style.display="block";
+  } else if(taskState.attempts>=1 && !taskState.solved){
+    hintBox.style.display="block";
+  }
+
+  checkBtn.addEventListener("click", function(){
+    let allCorrect = true;
+    table.querySelectorAll("input:not(.given)").forEach(function(inp){
+      const i = parseInt(inp.dataset.i,10);
+      const expected = cfg.yValues[i];
+      const val = parseStudentNumber(inp.value);
+      taskState.values[i] = inp.value;
+      const ok = !isNaN(val) && Math.abs(val-expected) < 0.001;
+      inp.classList.remove("correct","wrong");
+      inp.classList.add(ok?"correct":"wrong");
+      if(!ok) allCorrect = false;
+    });
+    if(allCorrect){
+      taskState.solved = true;
+      fb.className = "feedback good";
+      fb.textContent = "✅ All correct — nice work!";
+      hintBox.style.display="none";
+      solutionBox.style.display="none";
+      table.querySelectorAll("input:not(.given)").forEach(function(inp){ inp.disabled=true; });
+      checkBtn.disabled = true;
+    }else{
+      taskState.attempts++;
+      fb.className = "feedback bad";
+      if(taskState.attempts>=2){
+        fb.textContent = "Let's check the worked solution below, then try to understand each step.";
+        hintBox.style.display="none";
+        solutionBox.style.display="block";
+      }else{
+        fb.textContent = "Not quite — check the Hint below and try again!";
+        hintBox.style.display="block";
+      }
+    }
+    saveState();
+  });
+
+  container.appendChild(box);
+  return box;
+}
+
+/* ============================================================
+   REUSABLE: PLOT-ON-GRID TASK
+   config = { id, xMin,xMax,yMin,yMax, xStep, yStep, points:[{x,y}], snap:0.5 or 1, note }
+   ============================================================ */
+function buildPlotTask(container, cfg){
+  const taskState = STATE.tasks[cfg.id] || { attempts:0, solved:false, plotted:[] };
+  STATE.tasks[cfg.id] = taskState;
+
+  const box = document.createElement("div");
+  box.className = "card";
+  box.innerHTML = `<p style="font-weight:700;">Now plot the points on the grid below${cfg.note ? " — "+cfg.note : ""}, then tap "Draw Line".</p>`;
+
+  const wrap = document.createElement("div");
+  wrap.className = "gridWrap";
+  const W = 600, H = Math.round(600 * (cfg.yMax-cfg.yMin)/(cfg.xMax-cfg.xMin) * 0.62) || 600;
+  const pad = 40;
+  const plotW = W - pad*2, plotH = H - pad*2;
+  const xToPx = function(x){ return pad + (x-cfg.xMin)/(cfg.xMax-cfg.xMin) * plotW; };
+  const yToPx = function(y){ return pad + (cfg.yMax-y)/(cfg.yMax-cfg.yMin) * plotH; };
+
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS,"svg");
+  svg.setAttribute("viewBox", "0 0 "+W+" "+H);
+
+  // gridlines
+  let gx = cfg.xMin;
+  while(gx <= cfg.xMax + 1e-9){
+    const px = xToPx(gx);
+    const line = document.createElementNS(svgNS,"line");
+    line.setAttribute("x1",px); line.setAttribute("x2",px);
+    line.setAttribute("y1",pad); line.setAttribute("y2",H-pad);
+    line.setAttribute("stroke", Math.abs(gx)<1e-9 ? "#333" : "#e0defa");
+    line.setAttribute("stroke-width", Math.abs(gx)<1e-9 ? 2 : 1);
+    svg.appendChild(line);
+    if(Math.round(gx*100)%Math.round(cfg.xStep*100)===0 && Math.abs(gx)>=1e-9){
+      const t = document.createElementNS(svgNS,"text");
+      t.setAttribute("x",px); t.setAttribute("y",yToPx(0)+14);
+      t.setAttribute("font-size","11"); t.setAttribute("text-anchor","middle"); t.setAttribute("fill","#555");
+      t.textContent = (gx%1===0)?gx:gx.toFixed(1);
+      svg.appendChild(t);
+    }
+    gx += cfg.xStep;
+  }
+  let gy = cfg.yMin;
+  while(gy <= cfg.yMax + 1e-9){
+    const py = yToPx(gy);
+    const line = document.createElementNS(svgNS,"line");
+    line.setAttribute("y1",py); line.setAttribute("y2",py);
+    line.setAttribute("x1",pad); line.setAttribute("x2",W-pad);
+    line.setAttribute("stroke", Math.abs(gy)<1e-9 ? "#333" : "#e0defa");
+    line.setAttribute("stroke-width", Math.abs(gy)<1e-9 ? 2 : 1);
+    svg.appendChild(line);
+    const t = document.createElementNS(svgNS,"text");
+    t.setAttribute("x",xToPx(0)-8); t.setAttribute("y",py+3);
+    t.setAttribute("font-size","11"); t.setAttribute("text-anchor","end"); t.setAttribute("fill","#555");
+    t.textContent = (gy%1===0)?gy:gy.toFixed(1);
+    svg.appendChild(t);
+    gy += cfg.yStep;
+  }
+  // axis labels
+  const xl = document.createElementNS(svgNS,"text");
+  xl.setAttribute("x",W-pad+14); xl.setAttribute("y",yToPx(0)+4); xl.setAttribute("font-size","13");
+  xl.setAttribute("fill","#333"); xl.textContent = "x"; svg.appendChild(xl);
+  const yl = document.createElementNS(svgNS,"text");
+  yl.setAttribute("x",xToPx(0)-4); yl.setAttribute("y",pad-10); yl.setAttribute("font-size","13");
+  yl.setAttribute("fill","#333"); yl.textContent = "y"; svg.appendChild(yl);
+
+  const lineGroup = document.createElementNS(svgNS,"g");
+  svg.appendChild(lineGroup);
+  const pointGroup = document.createElementNS(svgNS,"g");
+  svg.appendChild(pointGroup);
+
+  wrap.appendChild(svg);
+  box.appendChild(wrap);
+
+  const snap = cfg.snap || 0.5;
+  function nearestValid(x,y){
+    const sx = Math.round(x/snap)*snap;
+    const sy = Math.round(y/snap)*snap;
+    return {x:sx,y:sy};
+  }
+  function findPointIndex(arr, pt){
+    for(let i=0;i<arr.length;i++){
+      if(Math.abs(arr[i].x-pt.x)<1e-6 && Math.abs(arr[i].y-pt.y)<1e-6) return i;
+    }
+    return -1;
+  }
+  function redrawPoints(){
+    pointGroup.innerHTML = "";
+    taskState.plotted.forEach(function(pt){
+      const c = document.createElementNS(svgNS,"circle");
+      c.setAttribute("cx", xToPx(pt.x)); c.setAttribute("cy", yToPx(pt.y));
+      c.setAttribute("r", 7); c.setAttribute("fill", "#6C5CE7"); c.setAttribute("stroke","#fff"); c.setAttribute("stroke-width",2);
+      pointGroup.appendChild(c);
+    });
+  }
+  redrawPoints();
+
+  function svgPointFromEvent(evt){
+    const rect = svg.getBoundingClientRect();
+    const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+    const px = (clientX-rect.left)/rect.width*W;
+    const py = (clientY-rect.top)/rect.height*H;
+    const x = cfg.xMin + (px-pad)/plotW*(cfg.xMax-cfg.xMin);
+    const y = cfg.yMax - (py-pad)/plotH*(cfg.yMax-cfg.yMin);
+    return {x:x,y:y};
+  }
+
+  svg.addEventListener("click", function(evt){
+    if(taskState.solved) return;
+    const raw = svgPointFromEvent(evt);
+    if(raw.x<cfg.xMin-snap || raw.x>cfg.xMax+snap || raw.y<cfg.yMin-snap || raw.y>cfg.yMax+snap) return;
+    const pt = nearestValid(raw.x, raw.y);
+    const idx = findPointIndex(taskState.plotted, pt);
+    if(idx>=0){ taskState.plotted.splice(idx,1); }
+    else{ taskState.plotted.push(pt); }
+    redrawPoints();
+    saveState();
+  });
+
+  const btnRow = document.createElement("div");
+  const checkBtn = document.createElement("button");
+  checkBtn.className = "actionBtn";
+  checkBtn.textContent = "Check Points";
+  const lineBtn = document.createElement("button");
+  lineBtn.className = "actionBtn secondary";
+  lineBtn.textContent = "Draw Line";
+  lineBtn.disabled = true;
+  btnRow.appendChild(checkBtn);
+  btnRow.appendChild(lineBtn);
+  box.appendChild(btnRow);
+
+  const fb = document.createElement("div");
+  fb.className = "feedback";
+  box.appendChild(fb);
+
+  const hintBox = document.createElement("div");
+  hintBox.className = "hintBox";
+  hintBox.innerHTML = "💡 <b>Hint:</b> " + (cfg.hint || "Look at your completed table — for your first x-value, what is its matching y-value? How many steps across, and how many steps up or down, would that point be from (0,0)?");
+  box.appendChild(hintBox);
+
+  const solutionBox = document.createElement("div");
+  solutionBox.style.display = "none";
+  solutionBox.innerHTML = `<div class="warnBox">Here are the correct points — compare them with yours, then tap "Draw Line".</div>`;
+  box.appendChild(solutionBox);
+
+  if(taskState.attempts>=2 && !taskState.solved){ hintBox.style.display="none"; solutionBox.style.display="block"; showAnswerPoints(); lineBtn.disabled=false; }
+  else if(taskState.attempts>=1 && !taskState.solved){ hintBox.style.display="block"; }
+  if(taskState.solved){ lineBtn.disabled=false; checkBtn.disabled=true; }
+
+  function showAnswerPoints(){
+    cfg.points.forEach(function(pt){
+      const c = document.createElementNS(svgNS,"circle");
+      c.setAttribute("cx", xToPx(pt.x)); c.setAttribute("cy", yToPx(pt.y));
+      c.setAttribute("r", 5); c.setAttribute("fill","none"); c.setAttribute("stroke","#17C3B2"); c.setAttribute("stroke-width",3);
+      pointGroup.appendChild(c);
+    });
+  }
+
+  function markSolved(){
+    fb.className = "feedback good";
+    fb.textContent = "✅ Points plotted correctly!";
+    checkBtn.disabled = true;
+  }
+
+  checkBtn.addEventListener("click", function(){
+    const ok = cfg.points.length === taskState.plotted.length && cfg.points.every(function(pt){
+      return findPointIndex(taskState.plotted, pt) >= 0;
+    });
+    if(ok){
+      taskState.solved = true;
+      markSolved();
+      hintBox.style.display="none";
+      solutionBox.style.display="none";
+      lineBtn.disabled = false;
+    }else{
+      taskState.attempts++;
+      fb.className = "feedback bad";
+      if(taskState.attempts>=2){
+        fb.textContent = "Let's compare with the correct points below.";
+        hintBox.style.display="none";
+        solutionBox.style.display="block";
+        showAnswerPoints();
+        lineBtn.disabled = false;
+      }else{
+        fb.textContent = "Not all points match yet — check the Hint and try again!";
+        hintBox.style.display="block";
+      }
+    }
+    saveState();
+  });
+
+  function drawLine(){
+    lineGroup.innerHTML = "";
+    const sorted = cfg.points.slice().sort(function(a,b){return a.x-b.x;});
+    const first = sorted[0], last = sorted[sorted.length-1];
+    const m = (last.y-first.y)/(last.x-first.x);
+    const c = first.y - m*first.x;
+    const yAt = function(x){ return m*x + c; };
+    const xAt = function(y){ return (y-c)/m; };
+
+    // Start from the grid's left edge and clip to the visible y-range if needed.
+    let x1 = cfg.xMin, y1 = yAt(x1);
+    if(y1 < cfg.yMin){ y1 = cfg.yMin; x1 = xAt(y1); }
+    else if(y1 > cfg.yMax){ y1 = cfg.yMax; x1 = xAt(y1); }
+
+    // Same for the right edge.
+    let x2 = cfg.xMax, y2 = yAt(x2);
+    if(y2 < cfg.yMin){ y2 = cfg.yMin; x2 = xAt(y2); }
+    else if(y2 > cfg.yMax){ y2 = cfg.yMax; x2 = xAt(y2); }
+
+    const l = document.createElementNS(svgNS,"line");
+    l.setAttribute("x1", xToPx(x1));
+    l.setAttribute("y1", yToPx(y1));
+    l.setAttribute("x2", xToPx(x2));
+    l.setAttribute("y2", yToPx(y2));
+    l.setAttribute("stroke","#FF2D85"); l.setAttribute("stroke-width",3);
+    lineGroup.appendChild(l);
+    taskState.lineDrawn = true;
+    saveState();
+  }
+  lineBtn.addEventListener("click", drawLine);
+
+  // Resume state on reload — safe here since every referenced element/function above is now initialized.
+  if(taskState.solved){ markSolved(); }
+  if(taskState.lineDrawn){ drawLine(); }
+
+  container.appendChild(box);
+}
+
+/* ============================================================
+   REUSABLE: MCQ (randomised position)
+   ============================================================ */
+function buildMCQ(container, cfg){
+  // cfg = {id, thinking:false, prompt, options:[{text, correct}], explanation}
+  const taskState = STATE.tasks[cfg.id] || { attempts:0, solved:false, order:null };
+  STATE.tasks[cfg.id] = taskState;
+
+  if(!taskState.order){
+    const idxArr = cfg.options.map(function(_,i){return i;});
+    for(let i=idxArr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [idxArr[i],idxArr[j]]=[idxArr[j],idxArr[i]]; }
+    taskState.order = idxArr;
+    saveState();
+  }
+
+  const box = document.createElement("div");
+  box.className = "card";
+  let html = "";
+  if(cfg.thinking) html += `<span class="thinkBadge">💭 Think</span><br>`;
+  html += `<p style="font-weight:700;">${cfg.prompt}</p>`;
+  box.innerHTML = html;
+
+  const optWrap = document.createElement("div");
+  taskState.order.forEach(function(origIdx){
+    const opt = cfg.options[origIdx];
+    const b = document.createElement("button");
+    b.className = "mcqOpt";
+    b.textContent = opt.text;
+    b.dataset.correct = opt.correct ? "1":"0";
+    optWrap.appendChild(b);
+  });
+  box.appendChild(optWrap);
+
+  const fb = document.createElement("div");
+  fb.className = "feedback";
+  box.appendChild(fb);
+
+  const hintBox = document.createElement("div");
+  hintBox.className = "hintBox";
+  hintBox.innerHTML = "💡 <b>Hint:</b> " + (cfg.hint || "Re-read the question carefully — which part of what's given tells you the answer?");
+  box.appendChild(hintBox);
+
+  if(taskState.attempts>=1 && !taskState.solved){ hintBox.style.display="block"; }
+
+  if(taskState.solved){
+    Array.from(optWrap.children).forEach(function(b){
+      if(b.dataset.correct==="1") b.classList.add("correctPick");
+      b.disabled = true;
+    });
+    fb.className="feedback good";
+    fb.textContent = "✅ " + cfg.explanation;
+    hintBox.style.display="none";
+  }
+
+  optWrap.addEventListener("click", function(e){
+    const b = e.target.closest(".mcqOpt");
+    if(!b || taskState.solved) return;
+    if(b.dataset.correct==="1"){
+      taskState.solved = true;
+      b.classList.add("correctPick");
+      Array.from(optWrap.children).forEach(function(x){x.disabled=true;});
+      fb.className="feedback good";
+      fb.textContent = "✅ " + cfg.explanation;
+      hintBox.style.display="none";
+    }else{
+      b.classList.add("wrongPick");
+      b.disabled = true;
+      taskState.attempts++;
+      fb.className="feedback bad";
+      if(taskState.attempts>=2){
+        fb.textContent = "The correct answer is highlighted — " + cfg.explanation;
+        hintBox.style.display="none";
+        Array.from(optWrap.children).forEach(function(x){
+          if(x.dataset.correct==="1") x.classList.add("correctPick");
+          x.disabled = true;
+        });
+        taskState.solved = true; // reveal, move on
+      }else{
+        fb.textContent = "Not quite — check the Hint below and try again!";
+        hintBox.style.display="block";
+      }
+    }
+    saveState();
+  });
+
+  container.appendChild(box);
+}
+
+/* ============================================================
+   PAGE RENDERERS
+   ============================================================ */
+function renderTitlePage(root){
+  root.innerHTML = `
+    <h2 class="pageTitle">Boon Lay Secondary School — Mathematics</h2>
+    <div class="subtle">Topic 11.2B · Linear Functions and Linear Graphs (2) · Sec 1 G3</div>
+    <div class="card">
+      <p style="font-weight:700;margin-bottom:10px;">By the end of this deck, I can:</p>
+      <ul class="objList" style="list-style:none;padding-left:0;">
+        <li><label><input type="checkbox">I can plot points and draw a graph of a linear function, given their coordinates.</label></li>
+        <li><label><input type="checkbox">I can work out the equation of a linear function given information such as the coordinates of a point in the function.</label></li>
+        <li><label><input type="checkbox">I can manipulate linear equations with two variables into the general form of a linear function.</label></li>
+      </ul>
+    </div>
+    <div class="card">
+      <p style="font-weight:700;margin-bottom:8px;">Key Vocabulary (you'll meet these soon!):</p>
+      <span class="term-chip">Function</span> <span class="term-chip">Corresponding</span> <span class="term-chip">Linear function</span>
+      <span class="term-chip">Linear graph</span> <span class="term-chip">Constants</span> <span class="term-chip">Constant function</span>
+    </div>`;
+}
+
+function renderEveryPage(root){
+  root.innerHTML = `
+    <h2 class="pageTitle">What You'll See On Every Page</h2>
+    <div class="card">
+      <div class="steps">
+        <div class="step-line">🔢 <b>Math Toolbar</b> (top, scrollable) — tap a symbol to insert it into whichever box you're typing in.</div>
+        <div class="step-line">💡 <b>Hint button/box</b> — appears automatically if your first try is wrong. It asks a guiding question — it won't give you the answer!</div>
+        <div class="step-line">📖 <b>Full worked solution</b> — appears if you're still stuck after 2 tries, so you can learn the method and move on.</div>
+        <div class="step-line">🖊️ <b>Click-to-plot grids</b> — tap a grid intersection to place a point; tap it again to remove it.</div>
+        <div class="step-line">●●● <b>Progress chips</b> (top bar) — show which page you're on and which pages are done.</div>
+        <div class="step-line">🔴 <b>Laser pointer</b> (bottom-right) — toggle on to get a glowing dot you can use to point things out during class discussion.</div>
+        <div class="step-line">🃏 <b>Flip cards</b> — tap a card to reveal the definition or worked example on the back. Tap again to hide it.</div>
+      </div>
+    </div>
+    <div class="warnBox">Your answers are saved automatically as you go — even if you close the tab, you can pick up right where you left off!</div>`;
+}
+
+function renderHookPage(root){
+  root.innerHTML = `
+    <h2 class="pageTitle">Why Scale Matters</h2>
+    <div class="card">
+      <p>Imagine you drew a graph where 1 unit on the <i>x</i>-axis takes up a tiny box, but 1 unit on the <i>y</i>-axis stretches across half the page.</p>
+      <p>Your straight line would look bent, squashed, or way too steep — even though the equation never changed!</p>
+      <p style="font-weight:700;">A good <b>scale</b> is what makes a graph fair, readable, and accurate. Let's learn how to read and choose one, then use it to plot linear graphs like a pro. 📈</p>
+    </div>`;
+}
+
+function renderVocabPage(root){
+  root.innerHTML = `<h2 class="pageTitle">Key Vocabulary</h2><div class="subtle">Tap each card to flip it over.</div>`;
+  const grid = document.createElement("div");
+  grid.className = "flipGrid";
+  const terms = [
+    ["Function","What is a function?", "A rule that pairs every input value with exactly one output value."],
+    ["Corresponding","What does 'corresponding' mean here?", "The matching output (y) value that goes with a particular input (x) value."],
+    ["Linear function","What is a linear function?", "A function whose graph is a straight line, usually written y = mx + c."],
+    ["Linear graph","What is a linear graph?", "The straight-line graph that represents a linear function."],
+    ["Constants","What are constants?", "Fixed numbers in an equation that do not change, e.g. m and c in y = mx + c."],
+    ["Constant function","What is a constant function?", "A function where y always equals the same value no matter what x is, e.g. y = 3 — its graph is a horizontal line."]
+  ];
+  terms.forEach(function(t, i){
+    grid.appendChild(makeFlipCard("vocab_"+i, t[1], "<b>"+t[0]+":</b> "+t[2]));
+  });
+  root.appendChild(grid);
+}
+
+function renderScalePage(root){
+  root.innerHTML = `<h2 class="pageTitle">Understanding Scale</h2>`;
+  const c1 = document.createElement("div");
+  c1.className = "card";
+  c1.innerHTML = `
+    <p>On any axis, we use the <b>same length</b> to represent 1 unit all the way along that axis.</p>
+    <p>For example: if 1 unit on the <i>x</i>-axis is represented by 1 cm, and 1 unit on the <i>y</i>-axis is represented by 2 cm, we say:</p>
+    <div class="steps">
+      <div class="step-line">Scale on the <i>x</i>-axis: 1 cm to 1 unit</div>
+      <div class="step-line">Scale on the <i>y</i>-axis: 2 cm to 1 unit</div>
+    </div>
+    <div class="warnBox">The scales on the two axes can be different from each other — but each axis must stay consistent along its own length!</div>`;
+  root.appendChild(c1);
+
+  root.appendChild(makeFlipCard("scale_ex", "🤔 What could go wrong if your scale isn't consistent?",
+    "If the spacing between units changes partway along an axis, your plotted points won't line up correctly, and your 'straight line' graph could come out bent or curved!"));
+
+  buildMCQ(root, {
+    id:"mcq_scale_1",
+    prompt:"A graph uses the scale '2 cm to 1 unit' on the y-axis. If a point has a y-value of 4, how far up the y-axis (in cm) should it be plotted?",
+    options:[
+      {text:"2 cm", correct:false},
+      {text:"4 cm", correct:false},
+      {text:"8 cm", correct:true},
+      {text:"16 cm", correct:false}
+    ],
+    hint:"If 1 unit takes up 2 cm, how many 'lots of 2 cm' would 4 units take up?",
+    explanation:"4 units × 2 cm per unit = 8 cm."
+  });
+
+  buildMCQ(root, {
+    id:"mcq_scale_2",
+    thinking:true,
+    prompt:"Why might a graph use a smaller scale (fewer cm per unit) for one axis than the other?",
+    options:[
+      {text:"To fit a wide range of values onto the page neatly", correct:true},
+      {text:"Because the x-axis and y-axis must always look identical", correct:false},
+      {text:"Scale never affects how a graph looks", correct:false},
+      {text:"To make the line curve instead of staying straight", correct:false}
+    ],
+    hint:"What might happen if one axis needs to show values up to 1000, but you used the same 'cm per unit' as an axis that only goes up to 10?",
+    explanation:"Different axes often need different scales so that all the values (which may have very different ranges) fit clearly on one grid."
+  });
+}
+
+function renderStepsPage(root){
+  root.innerHTML = `<h2 class="pageTitle">3 Steps to Draw a Linear Graph</h2>`;
+  const grid = document.createElement("div");
+  grid.className = "flipGrid";
+  grid.appendChild(makeFlipCard("step1card","Step 1 — what comes first?","Set up a table of values for x and y."));
+  grid.appendChild(makeFlipCard("step2card","Step 2 — what comes next?","Plot the points on the coordinate plane."));
+  grid.appendChild(makeFlipCard("step3card","Step 3 — how do you finish?","Draw a straight line to pass through the points, and label the graph."));
+  root.appendChild(grid);
+  const c = document.createElement("div");
+  c.className="card";
+  c.innerHTML = `<p style="font-weight:700;">Quick tip for completing a table:</p>
+    <p>Substitute the given value of <i>x</i> into the equation to find its matching (corresponding) <i>y</i>-value.</p>
+    <p>Example: for y = ${frac('1','2')}x + 1, when x = 4:</p>
+    <div class="steps">
+      <div class="step-line">y = ${frac('1','2')}(4) + 1</div>
+      <div class="step-line">y = 2 + 1</div>
+      <div class="step-line">y = 3</div>
+    </div>`;
+  root.appendChild(c);
+}
+
+function renderExample1(root){
+  root.innerHTML = `<h2 class="pageTitle">Example 1: y = −x + 2</h2>
+    <div class="card"><p>Complete the table, then plot the graph of y = −x + 2 for 0 ≤ x ≤ 8, using a scale of 1 cm to 1 unit on both axes.</p></div>`;
+  buildTableTask(root, {
+    id:"ex1_table",
+    equationHTML:"<b>y = −x + 2</b>",
+    xValues:[0,4,8],
+    yValues:[2,-2,-6],
+    givenIndices:[],
+    hint:"When x = 0, what is −x? Once you know that, what do you still need to do to get y? Try the same thinking for x = 4 and x = 8.",
+    workingSteps:[
+      "When x = 0: y = −(0) + 2 = 2",
+      "When x = 4: y = −(4) + 2 = −2",
+      "When x = 8: y = −(8) + 2 = −6"
+    ]
+  });
+  buildPlotTask(root, {
+    id:"ex1_plot",
+    xMin:0,xMax:8,yMin:-6,yMax:2,xStep:1,yStep:1,snap:1,
+    points:[{x:0,y:2},{x:4,y:-2},{x:8,y:-6}],
+    hint:"Your first pair is (0, 2). Which axis shows the 0? Which axis shows the 2? Now try the same thinking for your other two pairs."
+  });
+}
+
+function renderExample2(root){
+  root.innerHTML = `<h2 class="pageTitle">Example 2: y = 2x + 4</h2>
+    <div class="card"><p>Two values are already filled in for you. Complete the rest of the table, then plot the graph for −1 ≤ x ≤ 3.</p></div>`;
+  buildTableTask(root, {
+    id:"ex2_table",
+    equationHTML:"<b>y = 2x + 4</b>",
+    xValues:[-1,0,1,2,3],
+    yValues:[2,4,6,8,10],
+    givenIndices:[1,4],
+    hint:"What do you get when you multiply your x-value by 2? What do you still need to do with that result to reach y?",
+    workingSteps:[
+      "When x = −1: y = 2(−1) + 4 = −2 + 4 = 2",
+      "When x = 1: y = 2(1) + 4 = 2 + 4 = 6",
+      "When x = 2: y = 2(2) + 4 = 4 + 4 = 8"
+    ]
+  });
+  buildPlotTask(root, {
+    id:"ex2_plot",
+    xMin:-2,xMax:3,yMin:-10,yMax:12,xStep:1,yStep:2,snap:1,
+    points:[{x:-1,y:2},{x:0,y:4},{x:1,y:6},{x:2,y:8},{x:3,y:10}],
+    hint:"Notice the y-axis here counts up in 2s, not 1s. If a point has y = 6, how many grid lines up from 0 is that?"
+  });
+}
+
+function renderB1(root){
+  root.innerHTML = `<h2 class="pageTitle">Practice B1</h2>
+    <div class="card"><p>Complete the table of values, then draw the graph of y = ${frac('1','2')}x + 1.</p></div>`;
+  buildTableTask(root, {
+    id:"b1_table",
+    equationHTML:`<b>y = ${frac('1','2')}x + 1</b>`,
+    xValues:[0,1,2,3,4],
+    yValues:[1,1.5,2,2.5,3],
+    givenIndices:[],
+    hint:`What is another way to think about multiplying a number by ${frac('1','2')}? Once you've done that to your x-value, what's the next step to reach y?`,
+    workingSteps:[
+      "When x = 0: y = (1/2)(0) + 1 = 0 + 1 = 1",
+      "When x = 1: y = (1/2)(1) + 1 = 0.5 + 1 = 1.5",
+      "When x = 2: y = (1/2)(2) + 1 = 1 + 1 = 2",
+      "When x = 3: y = (1/2)(3) + 1 = 1.5 + 1 = 2.5",
+      "When x = 4: y = (1/2)(4) + 1 = 2 + 1 = 3"
+    ]
+  });
+  buildPlotTask(root, {
+    id:"b1_plot",
+    xMin:0,xMax:4,yMin:0,yMax:4,xStep:1,yStep:1,snap:0.5,
+    points:[{x:0,y:1},{x:1,y:1.5},{x:2,y:2},{x:3,y:2.5},{x:4,y:3}],
+    hint:"Some of your y-values fall exactly halfway between two gridlines. Where would 1.5 sit compared to 1 and 2?"
+  });
+}
+
+function renderB2(root){
+  root.innerHTML = `<h2 class="pageTitle">Practice B2</h2>
+    <div class="card"><p>Complete the table of values, then draw the graph of y = −2x + 11 for 0 ≤ x ≤ 5.</p></div>`;
+  buildTableTask(root, {
+    id:"b2_table",
+    equationHTML:"<b>y = −2x + 11</b>",
+    xValues:[0,1,2,3,4,5],
+    yValues:[11,9,7,5,3,1],
+    givenIndices:[2,3],
+    hint:"What do you get when you double your x-value? What do you do with that result and 11 to find y?",
+    workingSteps:[
+      "When x = 0: y = −2(0) + 11 = 0 + 11 = 11",
+      "When x = 1: y = −2(1) + 11 = −2 + 11 = 9",
+      "When x = 4: y = −2(4) + 11 = −8 + 11 = 3",
+      "When x = 5: y = −2(5) + 11 = −10 + 11 = 1"
+    ]
+  });
+  buildPlotTask(root, {
+    id:"b2_plot",
+    xMin:0,xMax:5,yMin:0,yMax:12,xStep:1,yStep:1,snap:1,
+    points:[{x:0,y:11},{x:1,y:9},{x:2,y:7},{x:3,y:5},{x:4,y:3},{x:5,y:1}],
+    hint:"As x increases here, does y get bigger or smaller? What might that tell you about which direction your line should slope?"
+  });
+}
+
+function renderB3(root){
+  root.innerHTML = `<h2 class="pageTitle">Practice B3</h2>
+    <div class="card"><p>Complete the table of values, then draw the graph of y = 6 − 4x for −1 ≤ x ≤ 3.</p></div>`;
+  buildTableTask(root, {
+    id:"b3_table",
+    equationHTML:"<b>y = 6 − 4x</b>",
+    xValues:[-1,0,1,2,3],
+    yValues:[10,6,2,-2,-6],
+    givenIndices:[2,4],
+    hint:"What is 4 times your x-value? What do you do with 6 and that result to find y? What happens to that step when x itself is negative?",
+    workingSteps:[
+      "When x = −1: y = 6 − 4(−1) = 6 + 4 = 10",
+      "When x = 0: y = 6 − 4(0) = 6 − 0 = 6",
+      "When x = 2: y = 6 − 4(2) = 6 − 8 = −2"
+    ]
+  });
+  buildPlotTask(root, {
+    id:"b3_plot",
+    xMin:-2,xMax:3,yMin:-10,yMax:12,xStep:1,yStep:2,snap:1,
+    points:[{x:-1,y:10},{x:0,y:6},{x:1,y:2},{x:2,y:-2},{x:3,y:-6}],
+    hint:"Some of your y-values are negative. Which direction from 0 does a negative y-value sit — up or down?"
+  });
+}
+
+function renderB4(root){
+  root.innerHTML = `<h2 class="pageTitle">Practice B4</h2>
+    <div class="card"><p>Complete the table of values for y = 2x − 1, then plot the graph for −2 ≤ x ≤ 2 on the grid below (in the original worksheet you would use graph paper — here, plot it right on this digital grid!).</p></div>`;
+  buildTableTask(root, {
+    id:"b4_table",
+    equationHTML:"<b>y = 2x − 1</b>",
+    xValues:[-2,-1,0,1,2],
+    yValues:[-5,-3,-1,1,3],
+    givenIndices:[0,1,4],
+    hint:"What do you get when you double your x-value? What's the next step to reach y?",
+    workingSteps:[
+      "When x = 0: y = 2(0) − 1 = 0 − 1 = −1",
+      "When x = 1: y = 2(1) − 1 = 2 − 1 = 1"
+    ]
+  });
+  buildPlotTask(root, {
+    id:"b4_plot",
+    xMin:-2,xMax:2,yMin:-5,yMax:3,xStep:1,yStep:1,snap:1,
+    points:[{x:-2,y:-5},{x:-1,y:-3},{x:0,y:-1},{x:1,y:1},{x:2,y:3}],
+    hint:"Your x-values include negative numbers too. Which side of 0 on the x-axis does a negative x sit?"
+  });
+}
+
+function renderSummaryPage(root){
+  root.innerHTML = `
+    <h2 class="pageTitle">Summary — 11.2B Linear Functions &amp; Linear Graphs (2)</h2>
+    <div class="screenshotReminder"><span class="emoji">📸</span>Screenshot this page before you leave! It has everything you need to revise.</div>
+
+    <div class="card">
+      <div class="summarySection">
+        <h3>1. Scale</h3>
+        <p>On any axis, the same length always represents 1 unit. The scale on the x-axis and the scale on the y-axis can be different from each other, e.g. "1 cm to 1 unit" on x and "2 cm to 1 unit" on y.</p>
+      </div>
+      <div class="summarySection">
+        <h3>2. Vocabulary Recap</h3>
+        <div class="steps">
+          <div class="step-line"><b>Function</b> — a rule pairing every input with exactly one output.</div>
+          <div class="step-line"><b>Corresponding</b> — the matching y-value for a given x-value.</div>
+          <div class="step-line"><b>Linear function</b> — a function whose graph is a straight line, y = mx + c.</div>
+          <div class="step-line"><b>Linear graph</b> — the straight-line graph of a linear function.</div>
+          <div class="step-line"><b>Constants</b> — fixed numbers in an equation, e.g. m and c.</div>
+          <div class="step-line"><b>Constant function</b> — y is always the same value; graph is a horizontal line.</div>
+        </div>
+      </div>
+      <div class="summarySection">
+        <h3>3. The 3 Steps to Draw a Linear Graph</h3>
+        <div class="steps">
+          <div class="step-line">Step 1: Set up a table of values for x and y.</div>
+          <div class="step-line">Step 2: Plot the points on the coordinate plane.</div>
+          <div class="step-line">Step 3: Draw a straight line through the points and label the graph.</div>
+        </div>
+      </div>
+      <div class="summarySection">
+        <h3>4. Worked Equations From This Deck</h3>
+        <div class="steps">
+          <div class="step-line">y = −x + 2 → at x = 0, 4, 8: y = 2, −2, −6</div>
+          <div class="step-line">y = 2x + 4 → at x = −1 to 3: y = 2, 4, 6, 8, 10</div>
+          <div class="step-line">y = ${frac('1','2')}x + 1 → at x = 0 to 4: y = 1, 1.5, 2, 2.5, 3</div>
+          <div class="step-line">y = −2x + 11 → at x = 0 to 5: y = 11, 9, 7, 5, 3, 1</div>
+          <div class="step-line">y = 6 − 4x → at x = −1 to 3: y = 10, 6, 2, −2, −6</div>
+          <div class="step-line">y = 2x − 1 → at x = −2 to 2: y = −5, −3, −1, 1, 3</div>
+        </div>
+      </div>
+      <div class="summarySection">
+        <h3>5. Common Errors to Avoid</h3>
+        <div class="warnBox">Forgetting to apply the negative sign correctly when substituting into terms like −x or −2x!</div>
+        <div class="warnBox">Using a different scale partway along the same axis — this bends your straight line into a curve.</div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+goToPage(STATE.currentPage || 0);
+
+})();
+</script>
+</body>
+</html>
